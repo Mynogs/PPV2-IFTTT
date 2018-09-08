@@ -1,0 +1,119 @@
+-- 08.09.2018 08:34:17 AR V1.0a
+
+block.setSize(151, 51)
+
+generic = {
+  parameter = {
+    key = 'klYCD21blpMeS6hmxlnTEl-aoCOWF1YYLXUtddnaM36',
+    event = 'on',
+    proxy = [[//192.168.1.5]],
+    port = 3128,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setInputPinTypeRestrains(1, 'boolean')
+    block.setInputPinName(1, 'trig')
+    block.setOutputsPinCount(2)
+    block.setOutputPinTypeRestrains(1, 'nil', 'string')
+    block.setOutputPinName(1, 'body')
+    block.setOutputPinTypeRestrains(2, 'number', 'string')
+    block.setOutputPinName(2, 'result')
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('HTMLInfo', 'Info', 'IFTTT',
+[[
+Send a event to a <a href="https://ifttt.com>IFTTT</a> applet<br><br>
+
+<u>Create an event and action service</u><br>
+<ul>
+<li>Log in or register to IFTTT<br>
+<li>Goto <i>My Applets</i> and press the <i>New Applet</i> button<br>
+<li>Click on <i>+this</i><br>
+<li>In the search textfield enter <i>Webhook</i><br>
+<li>Click on the blue <i>Webhook</i> symbol<br>
+<li>Click on the blue <i>Receive a web request...</i> symbol to create a webhook<br>
+<li>Enter an event name and press <i>Create trigger</i><br>
+<li>Continue with the <i>+that</i> and choose an action service<br>
+</ul>
+<u>Found out the key</u><br>
+<ul>
+<li>Log in or register to IFTTT<br>
+<li>Open web page <a href="https://ifttt.com/maker_webhooks">https://ifttt.com/maker_webhooks</a><br>
+<li>Press the <i>Documentaion</i> button<br>
+<li>Your key is shown in the first line in bold<br>
+</ul>
+]]
+    )
+    gui.add('Edit', 'EditKey', 'Key', {Width = 300})
+    gui.add('Edit', 'EditEvent', 'Event')
+    gui.add('Edit', 'EditProxy', 'Proxy (left empty for no proxy server)', {Left = 260})
+    gui.add('Edit', 'EditPort', 'Port (0 don\'t set proxy server port)', {Left = 260})
+    gui.set('EditKey', 'Text', self.parameter.key)
+    gui.set('EditEvent', 'Text', self.parameter.event)
+    gui.set('EditProxy', 'Text', self.parameter.proxy)
+    gui.set('EditPort', 'Integer', self.parameter.port)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.key = gui.get('EditKey', 'Text')
+    self.parameter.event = gui.get('EditEvent', 'Text')
+    self.parameter.proxy = gui.get('EditProxy', 'Text')
+    self.parameter.port = gui.get('EditPort', 'Integer')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar{
+      Type = 0x00,
+      FillColorSource = '0.9, 0.9, 0.9',
+      CenterTextSource = '"Trigger"',
+      CenterDrawSource =
+        'draw.setColorA(0x0099FF) draw.box(3, 3, 16, 11)' ..
+        'draw.setColorA(0xEE493A) draw.box(3, 13, 11, 6)' ..
+        'draw.setColorA(0x333333) draw.box(13, 13, 6, 6)' ..
+        'draw.setColorA(0x0099FF) draw.text(20, 10, 0, 0, "IFTTT", 3, false)'
+    }
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        local block = {}
+
+        block.start = function()
+          block.http = require 'socket.http'
+          PROXY
+          PORT
+          block.code = 0
+        end
+
+        block.step = function(trig)
+          if not block.trig and trig then
+            block.body, block.code = block.http.request('URL')
+          end
+          block.trig = trig
+          return block.body, block.code
+        end
+
+        block.stop = function()
+        end
+
+        return block
+      ]==]
+    local replaces = {
+      ['URL'] = "http://maker.ifttt.com/trigger/" .. self.parameter.event .. "/with/key/" .. self.parameter.key,
+      ['PROXY'] = self.parameter.proxy:len() > 0 and "block.http.PROXY = [[" .. self.parameter.proxy .. "]]" or "",
+      ['PORT'] = self.parameter.port > 0 and "block.http.PORT = " .. self.parameter.port or "",
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+
+
