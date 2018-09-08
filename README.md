@@ -6,7 +6,7 @@ To install the block library please look here: [Install blocks](https://github.c
 
 
 
-Send a event to a <a href="https://ifttt.com>IFTTT</a> applet<br><br>
+Send a event to a [IFTTT](https://ifttt.com) applet<br><br>
 <u>Create an event and action service</u><br>
 <ul>
 <li>Log in or register to IFTTT<br>
@@ -21,7 +21,7 @@ Send a event to a <a href="https://ifttt.com>IFTTT</a> applet<br><br>
 <u>Found out the key</u><br>
 <ul>
 <li>Log in or register to IFTTT<br>
-<li>Open web page <a href="https://ifttt.com/maker_webhooks">https://ifttt.com/maker_webhooks</a><br>
+<li>Open web page https://ifttt.com/maker_webhooks<br>
 <li>Press the <i>Documentaion</i> button<br>
 <li>Your key is shown in the first line in bold<br>
 </ul>
